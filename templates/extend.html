@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark — Extend Reservation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0f19;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: #1a2035;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #6366f1);
+        }
+        .icon-circle {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+        }
+        .icon-circle.extend { background: rgba(245,158,11,.15); }
+        .icon-circle.success { background: rgba(34,197,94,.15); }
+        .icon-circle.error { background: rgba(239,68,68,.15); }
+
+        h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+        .subtitle { color: #94a3b8; font-size: .9rem; margin-bottom: 24px; }
+
+        .details {
+            background: #111827;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #94a3b8; font-size: .85rem; }
+        .detail-value { font-weight: 600; font-size: .9rem; }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: .85rem;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #111827;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            transition: border-color .2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.6);
+            cursor: pointer;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all .25s ease;
+            width: 100%;
+        }
+        .btn-extend {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+        }
+        .btn-extend:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,.3); }
+        .btn-extend:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.15);
+            color: #94a3b8;
+            margin-top: 12px;
+            font-size: .9rem;
+            padding: 10px;
+        }
+        .btn-back:hover { border-color: rgba(255,255,255,.3); color: #e2e8f0; }
+
+        .status-msg { margin-top: 16px; font-size: .9rem; line-height: 1.5; }
+        .status-msg.success { color: #22c55e; }
+        .status-msg.error { color: #ef4444; }
+
+        .loading { color: #94a3b8; font-size: .9rem; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,.1);
+            border-top-color: #f59e0b;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="card" id="mainCard">
+        <div class="spinner"></div>
+        <p class="loading">Loading reservation details...</p>
+    </div>
+
+    <script>
+        const RES_ID = {{ reservation_id }};
+        const API = '';
+
+        async function loadDetails() {
+            try {
+                const res = await fetch(`${API}/reservation-details/${RES_ID}`);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error);
+                renderCard(data.reservation);
+            } catch (err) {
+                document.getElementById('mainCard').innerHTML = `
+                    <div class="icon-circle error">❌</div>
+                    <h1>Reservation Not Found</h1>
+                    <p class="subtitle">${err.message}</p>
+                `;
+            }
+        }
+
+        function renderCard(r) {
+            const card = document.getElementById('mainCard');
+
+            if (r.status !== 'confirmed') {
+                card.innerHTML = `
+                    <div class="icon-circle error">❌</div>
+                    <h1>Cannot Extend</h1>
+                    <p class="subtitle">Only confirmed reservations can be extended.<br>Current status: <strong>${r.status}</strong></p>
+                `;
+                return;
+            }
+
+            // Set default new end time to 1 hour after current end
+            const currentEnd = r.end_time.replace(' ', 'T');
+
+            card.innerHTML = `
+                <div class="icon-circle extend">⏰</div>
+                <h1>Extend Reservation #${String(r.reservation_id).padStart(6, '0')}</h1>
+                <p class="subtitle">Choose your new end time below</p>
+                <div class="details">
+                    <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${r.user_name}</span></div>
+                    <div class="detail-row"><span class="detail-label">Slot</span><span class="detail-value">${r.slot_label || 'Slot ' + r.slot_id}</span></div>
+                    <div class="detail-row"><span class="detail-label">Current End</span><span class="detail-value">${r.end_time}</span></div>
+                </div>
+                <div class="form-group">
+                    <label for="newEndTime">New End Time</label>
+                    <input type="datetime-local" id="newEndTime" min="${currentEnd}">
+                </div>
+                <button class="btn btn-extend" id="extendBtn" onclick="extendReservation()">⏰ Extend Reservation</button>
+                <div class="status-msg" id="statusMsg"></div>
+                <button class="btn btn-back" onclick="window.history.back()">← Go Back</button>
+            `;
+
+            // Pre-fill with 1 hour extension
+            const endDate = new Date(currentEnd);
+            endDate.setHours(endDate.getHours() + 1);
+            const pad = n => String(n).padStart(2, '0');
+            const defaultNew = `${endDate.getFullYear()}-${pad(endDate.getMonth()+1)}-${pad(endDate.getDate())}T${pad(endDate.getHours())}:${pad(endDate.getMinutes())}`;
+            document.getElementById('newEndTime').value = defaultNew;
+        }
+
+        async function extendReservation() {
+            const btn = document.getElementById('extendBtn');
+            const msg = document.getElementById('statusMsg');
+            const newEnd = document.getElementById('newEndTime').value;
+
+            if (!newEnd) {
+                msg.className = 'status-msg error';
+                msg.textContent = 'Please select a new end time.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Extending...';
+
+            try {
+                const res = await fetch(`${API}/extend-reservation/${RES_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_end_time: newEnd })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.className = 'status-msg success';
+                    msg.textContent = '✅ ' + data.message;
+                    btn.textContent = 'Extended!';
+                    btn.style.background = '#22c55e';
+                    setTimeout(() => loadDetails(), 2000);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                msg.className = 'status-msg error';
+                msg.textContent = '❌ ' + err.message;
+                btn.disabled = false;
+                btn.textContent = '⏰ Extend Reservation';
+            }
+        }
+
+        loadDetails();
+    </script>
+</body>
+</html>

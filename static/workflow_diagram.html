@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Parking System - Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .workflow {
+            position: relative;
+            width: 1100px;
+        }
+
+        .workflow h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+            color: #333;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .node {
+            min-width: 130px;
+            padding: 16px 18px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            border-radius: 10px;
+            position: relative;
+            white-space: nowrap;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, .12);
+        }
+
+        .node.blue {
+            background: linear-gradient(135deg, #4A90D9, #5BA3EC);
+        }
+
+        .node.green {
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            border-radius: 30px;
+            padding: 14px 28px;
+        }
+
+        .node.orange {
+            background: linear-gradient(135deg, #F39C12, #E67E22);
+        }
+
+        .node.red {
+            background: linear-gradient(135deg, #E74C3C, #C0392B);
+        }
+
+        .node.purple {
+            background: linear-gradient(135deg, #8E44AD, #9B59B6);
+        }
+
+        .node small {
+            display: block;
+            font-weight: 400;
+            font-size: 10px;
+            opacity: .85;
+            margin-top: 3px;
+        }
+
+        .arrow {
+            width: 40px;
+            height: 2px;
+            background: #555;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: -5px;
+            border: 6px solid transparent;
+            border-left: 8px solid #555;
+        }
+
+        .arrow-down {
+            width: 2px;
+            height: 50px;
+            background: #555;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .arrow-down::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: -5px;
+            border: 6px solid transparent;
+            border-top: 8px solid #555;
+        }
+
+        .connector {
+            position: absolute;
+            right: 65px;
+            top: 72px;
+            width: 2px;
+            height: 58px;
+            background: #555;
+        }
+
+        .connector::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: -5px;
+            border: 6px solid transparent;
+            border-top: 8px solid #555;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #333;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .label {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            margin-top: -12px;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="workflow">
+        <h2>Smart Parking System — Workflow Diagram</h2>
+
+        <!-- ROW 1: Detection Pipeline -->
+        <div class="label">Detection Pipeline</div>
+        <div class="row">
+            <div class="node green">
+                Start
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">1</span>
+                CCTV /<br>Video Feed
+                <small>parking_feed.mkv</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">2</span>
+                Frame Capture
+                <small>OpenCV (every 30s)</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">3</span>
+                YOLOv8x<br>Detection
+                <small>Vehicle Recognition</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">4</span>
+                IoU Slot<br>Matching
+                <small>Overlap ≥ 0.08</small>
+            </div>
+        </div>
+
+        <!-- Vertical connector -->
+        <div class="connector"></div>
+
+        <!-- ROW 2: Data & Display Pipeline -->
+        <div class="label" style="margin-top: 40px;">Data Processing & Display</div>
+        <div class="row">
+            <div class="node orange">
+                <span class="step-number">5</span>
+                Grace Period<br>Check
+                <small>15-min window</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">6</span>
+                MySQL<br>Database
+                <small>Slots / Reservations</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">7</span>
+                Flask API<br>Server
+                <small>REST Endpoints</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node purple">
+                <span class="step-number">8</span>
+                Web<br>Dashboard
+                <small>Real-time UI</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node blue">
+                <span class="step-number">9</span>
+                Prediction<br>Engine
+                <small>Linear Regression</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node green">
+                End
+            </div>
+        </div>
+
+        <!-- ROW 3: Sub-processes -->
+        <div style="display: flex; gap: 12px; margin-top: 30px; justify-content: center;">
+            <div style="text-align: center;">
+                <div class="arrow-down"></div>
+                <div class="node red" style="margin-top: 8px;">
+                    Overstay<br>Detection
+                    <small>Alert System</small>
+                </div>
+            </div>
+            <div style="width: 80px;"></div>
+            <div style="text-align: center;">
+                <div class="arrow-down"></div>
+                <div class="node orange" style="margin-top: 8px;">
+                    Reservation<br>System
+                    <small>Booking + Cancel</small>
+                </div>
+            </div>
+            <div style="width: 80px;"></div>
+            <div style="text-align: center;">
+                <div class="arrow-down"></div>
+                <div class="node purple" style="margin-top: 8px;">
+                    Charts &<br>Analytics
+                    <small>Peak Hours / History</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

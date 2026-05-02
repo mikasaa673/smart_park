@@ -1,0 +1,44 @@
+# ── Python ──────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual Environment ─────────────────────
+venv/
+env/
+.venv/
+
+# ── Environment / Secrets ───────────────────
+.env
+*.env
+
+# ── Video files (too large for git) ─────────
+*.mp4
+*.mkv
+*.avi
+*.mov
+
+# ── Extracted frames / images ───────────────
+frame_*.jpg
+
+# ── IDE / Editor ────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS files ────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Test / utility scripts ──────────────────
+test_email.py
+test_pdf_email.py
+patch_pdf_footer.py
+debug_detect.py

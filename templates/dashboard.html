@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Admin Dashboard — Monitor occupancy, view peak hours, manage reservations, and overstay alerts.">
+    <title>Dashboard | SmartPark</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- ===================== NAV BAR ===================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon"><i class="material-icons">local_parking</i></span>
+            <span class="nav-title">SmartPark</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link" id="nav-home">Parking</a>
+            <a href="/dashboard" class="nav-link active" id="nav-dashboard">Dashboard</a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme"><i
+                    class="material-icons">dark_mode</i></button>
+            <div class="nav-status" id="navStatus">
+                <span class="status-dot online"></span>
+                <span class="status-text">Admin Panel</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== DASHBOARD HEADER ===================== -->
+    <header class="dash-header" id="dashHeader">
+        <div class="dash-header-content">
+            <h1 class="dash-title">Admin <span class="gradient-text">Dashboard</span></h1>
+            <p class="dash-subtitle">Real-time monitoring &bull; Analytics &bull; Alerts</p>
+        </div>
+    </header>
+
+    <!-- ===================== SUMMARY CARDS ===================== -->
+    <section class="dash-section" id="summarySection">
+        <div class="summary-grid">
+            <div class="summary-card card-total" id="cardTotal">
+                <div class="summary-icon"><i class="material-icons">garage</i></div>
+                <div class="summary-info">
+                    <div class="summary-number" id="summTotal">--</div>
+                    <div class="summary-label">Total Slots</div>
+                </div>
+            </div>
+            <div class="summary-card card-available" id="cardAvailable">
+                <div class="summary-icon"><i class="material-icons">check_circle</i></div>
+                <div class="summary-info">
+                    <div class="summary-number" id="summAvailable">--</div>
+                    <div class="summary-label">Available</div>
+                </div>
+            </div>
+            <div class="summary-card card-occupied" id="cardOccupied">
+                <div class="summary-icon"><i class="material-icons">directions_car</i></div>
+                <div class="summary-info">
+                    <div class="summary-number" id="summOccupied">--</div>
+                    <div class="summary-label">Occupied</div>
+                </div>
+            </div>
+            <div class="summary-card card-overstay" id="cardOverstay">
+                <div class="summary-icon"><i class="material-icons">warning</i></div>
+                <div class="summary-info">
+                    <div class="summary-number" id="summOverstays">0</div>
+                    <div class="summary-label">Overstays</div>
+                </div>
+            </div>
+            <div class="summary-card card-confirmed" id="cardConfirmed" style="border-left:3px solid #22c55e;">
+                <div class="summary-icon"><i class="material-icons">verified</i></div>
+                <div class="summary-info">
+                    <div class="summary-number" id="summConfirmed">0</div>
+                    <div class="summary-label">Confirmed</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== CHARTS ROW ===================== -->
+    <section class="dash-section" id="chartsSection">
+        <div class="charts-grid">
+            <!-- Daily Occupancy Chart -->
+            <div class="chart-card" id="chartOccupancyCard">
+                <h3 class="chart-title">Daily Occupancy Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="occupancyChart"></canvas>
+                </div>
+            </div>
+            <!-- Peak Hours Chart -->
+            <div class="chart-card" id="chartPeakCard">
+                <h3 class="chart-title">Peak Hour Analysis</h3>
+                <div class="chart-wrapper">
+                    <canvas id="peakChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== PREDICTION CHART ===================== -->
+    <section class="dash-section" id="predictionSection">
+        <div class="chart-card wide" id="chartPredictionCard">
+            <h3 class="chart-title">Future Availability Prediction</h3>
+            <div class="chart-wrapper">
+                <canvas id="predictionChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== ISSUE TICKET ===================== -->
+    <section class="dash-section" id="issueTicketSection">
+        <h2 class="section-title">🎫 Issue Ticket</h2>
+        <div class="chart-card wide" style="padding:24px 28px;">
+            <form id="adminBookingForm" onsubmit="return adminIssueTicket(event)">
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+                    <div class="form-group">
+                        <label for="adminName">Customer Name *</label>
+                        <input type="text" id="adminName" required placeholder="Full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPlate">Car Plate</label>
+                        <input type="text" id="adminPlate" placeholder="e.g. KA01AB1234" style="text-transform:uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminEmail">Email</label>
+                        <input type="email" id="adminEmail" placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminSlot">Slot *</label>
+                        <select id="adminSlot" required>
+                            <option value="">Loading slots...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminStart">Start Time *</label>
+                        <input type="datetime-local" id="adminStart" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminEnd">End Time *</label>
+                        <input type="datetime-local" id="adminEnd" required>
+                    </div>
+                </div>
+                <div style="margin-top:18px;display:flex;align-items:center;gap:16px;">
+                    <button type="submit" class="btn-cancel" id="issueBtn"
+                        style="background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;padding:10px 28px;border-radius:10px;font-weight:700;font-size:.95rem;border:none;cursor:pointer;">
+                        🎫 Issue Ticket
+                    </button>
+                    <span id="issueMsg" style="font-size:.9rem;"></span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ===================== OVERSTAY ALERTS ===================== -->
+    <section class="dash-section" id="overstaySection">
+        <h2 class="section-title">Overstay Alerts</h2>
+        <div class="alerts-container" id="alertsContainer">
+            <p class="no-data" id="noOverstays">No overstays detected.</p>
+        </div>
+    </section>
+
+    <!-- ===================== RESERVATIONS TABLE ===================== -->
+    <section class="dash-section" id="reservationsSection">
+        <h2 class="section-title">Active Reservations</h2>
+        <div class="table-wrapper">
+            <table class="data-table" id="reservationsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Car Plate</th>
+                        <th>Email</th>
+                        <th>Slot</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="reservationsBody">
+                    <tr>
+                        <td colspan="9" class="no-data">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===================== CONFIRMED RESERVATIONS TABLE ===================== -->
+    <section class="dash-section" id="confirmedSection">
+        <h2 class="section-title">✅ Confirmed Reservations</h2>
+        <div class="table-wrapper">
+            <table class="data-table" id="confirmedTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Car Plate</th>
+                        <th>Email</th>
+                        <th>Slot</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Verified At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="confirmedBody">
+                    <tr>
+                        <td colspan="9" class="no-data">No confirmed reservations.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===================== SLOT MAP ===================== -->
+    <section class="dash-section" id="slotMapSection">
+        <h2 class="section-title">Slot Map</h2>
+        <div class="parking-grid dashboard-grid" id="dashSlotGrid">
+            <!-- Filled by JS -->
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer" id="footer">
+        <p>&copy; 2026 SmartPark &mdash; Admin Dashboard</p>
+    </footer>
+
+    <!-- Theme initialisation -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem('sp-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.innerHTML = saved === 'light' ? '<i class="material-icons">light_mode</i>' : '<i class="material-icons">dark_mode</i>';
+        })();
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('sp-theme', next);
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.innerHTML = next === 'light' ? '<i class="material-icons">light_mode</i>' : '<i class="material-icons">dark_mode</i>';
+        }
+    </script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>

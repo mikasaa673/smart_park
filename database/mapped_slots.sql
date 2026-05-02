@@ -1,0 +1,75 @@
+-- Auto-generated slot coordinates from slot_mapper.py
+-- Run this AFTER creating the parking_slots table
+
+DELETE FROM parking_slots;
+
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (1, 'S1', 30, 81, 153, 139, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (2, 'S2', 31, 135, 149, 193, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (3, 'S3', 34, 189, 154, 240, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (4, 'S4', 39, 237, 155, 285, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (5, 'S5', 37, 281, 156, 336, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (6, 'S6', 42, 332, 158, 384, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (7, 'S7', 43, 384, 157, 431, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (8, 'S8', 47, 428, 155, 477, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (9, 'S9', 52, 476, 157, 526, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (10, 'S10', 58, 521, 161, 574, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (11, 'S11', 53, 577, 159, 621, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (12, 'S12', 52, 626, 161, 673, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (13, 'S13', 159, 93, 262, 139, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (14, 'S14', 157, 194, 266, 241, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (15, 'S15', 153, 142, 265, 189, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (16, 'S16', 159, 243, 266, 285, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (17, 'S17', 161, 286, 266, 336, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (18, 'S18', 163, 335, 265, 381, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (19, 'S19', 160, 384, 262, 430, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (20, 'S20', 161, 433, 262, 478, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (21, 'S21', 162, 479, 262, 526, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (22, 'S22', 165, 529, 262, 571, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (23, 'S23', 163, 578, 263, 622, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (24, 'S24', 163, 626, 260, 665, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (25, 'S25', 395, 99, 500, 140, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (26, 'S26', 398, 148, 504, 188, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (27, 'S27', 394, 194, 501, 238, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (28, 'S28', 396, 241, 502, 282, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (29, 'S29', 402, 290, 505, 330, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (30, 'S30', 403, 340, 502, 378, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (31, 'S31', 403, 384, 502, 426, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (32, 'S32', 403, 430, 503, 471, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (33, 'S33', 400, 525, 504, 568, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (34, 'S34', 398, 572, 505, 615, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (35, 'S35', 404, 617, 505, 668, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (36, 'S36', 508, 570, 623, 613, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (37, 'S37', 515, 617, 620, 671, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (38, 'S38', 507, 98, 611, 141, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (39, 'S39', 508, 146, 607, 183, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (40, 'S40', 510, 195, 605, 232, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (41, 'S41', 511, 240, 607, 282, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (42, 'S42', 509, 289, 610, 328, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (43, 'S43', 510, 334, 612, 377, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (44, 'S44', 509, 380, 615, 425, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (45, 'S45', 508, 431, 615, 471, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (46, 'S46', 740, 91, 851, 135, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (47, 'S47', 739, 137, 848, 184, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (48, 'S48', 748, 186, 853, 235, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (49, 'S49', 743, 235, 852, 280, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (50, 'S50', 747, 284, 853, 325, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (51, 'S51', 744, 331, 853, 377, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (52, 'S52', 743, 375, 848, 424, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (53, 'S53', 745, 422, 855, 472, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (54, 'S54', 746, 474, 850, 516, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (55, 'S55', 750, 517, 851, 564, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (56, 'S56', 750, 568, 853, 611, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (57, 'S57', 750, 614, 857, 665, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (58, 'S58', 898, 141, 999, 190, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (59, 'S59', 898, 189, 999, 234, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (60, 'S60', 898, 235, 1000, 281, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (61, 'S61', 899, 280, 1000, 329, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (62, 'S62', 902, 328, 998, 378, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (63, 'S63', 899, 380, 998, 425, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (64, 'S64', 901, 429, 999, 472, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (65, 'S65', 905, 475, 1002, 519, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (66, 'S66', 901, 524, 1002, 565, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (67, 'S67', 903, 570, 1003, 615, FALSE);
+INSERT INTO parking_slots (slot_id, slot_label, x1, y1, x2, y2, is_occupied) VALUES (68, 'S68', 903, 618, 1004, 660, FALSE);
+
+-- Total: 68 slots

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark — Verify Reservation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0f19;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: #1a2035;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #22c55e);
+        }
+        .icon-circle {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+        }
+        .icon-circle.pending { background: rgba(99,102,241,.15); }
+        .icon-circle.success { background: rgba(34,197,94,.15); }
+        .icon-circle.error { background: rgba(239,68,68,.15); }
+        .icon-circle.expired { background: rgba(245,158,11,.15); }
+
+        h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+        .subtitle { color: #94a3b8; font-size: .9rem; margin-bottom: 24px; }
+
+        .details {
+            background: #111827;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #94a3b8; font-size: .85rem; }
+        .detail-value { font-weight: 600; font-size: .9rem; }
+
+        .grace-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: .8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .grace-badge.ok { background: rgba(34,197,94,.12); color: #22c55e; }
+        .grace-badge.warning { background: rgba(245,158,11,.12); color: #f59e0b; }
+        .grace-badge.expired { background: rgba(239,68,68,.12); color: #ef4444; }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all .25s ease;
+            width: 100%;
+        }
+        .btn-confirm {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,.3); }
+        .btn-confirm:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.15);
+            color: #94a3b8;
+            margin-top: 12px;
+            font-size: .9rem;
+            padding: 10px;
+        }
+        .btn-back:hover { border-color: rgba(255,255,255,.3); color: #e2e8f0; }
+
+        .status-msg { margin-top: 16px; font-size: .9rem; line-height: 1.5; }
+        .status-msg.success { color: #22c55e; }
+        .status-msg.error { color: #ef4444; }
+
+        .loading { color: #94a3b8; font-size: .9rem; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="card" id="mainCard">
+        <div class="spinner"></div>
+        <p class="loading">Loading reservation details...</p>
+    </div>
+
+    <script>
+        const RES_ID = {{ reservation_id }};
+        const API = '';
+
+        async function loadDetails() {
+            try {
+                const res = await fetch(`${API}/reservation-details/${RES_ID}`);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error);
+                renderCard(data.reservation);
+            } catch (err) {
+                document.getElementById('mainCard').innerHTML = `
+                    <div class="icon-circle error">❌</div>
+                    <h1>Reservation Not Found</h1>
+                    <p class="subtitle">${err.message}</p>
+                    <button class="btn btn-back" onclick="window.location.href='/dashboard'">← Dashboard</button>
+                `;
+            }
+        }
+
+        function renderCard(r) {
+            const card = document.getElementById('mainCard');
+
+            if (r.status === 'confirmed') {
+                card.innerHTML = `
+                    <div class="icon-circle success">✅</div>
+                    <h1>Already Confirmed</h1>
+                    <p class="subtitle">This reservation was already verified.</p>
+                    <div class="details">
+                        <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${r.user_name}</span></div>
+                        <div class="detail-row"><span class="detail-label">Slot</span><span class="detail-value">${r.slot_label || 'Slot ' + r.slot_id}</span></div>
+                        <div class="detail-row"><span class="detail-label">Verified At</span><span class="detail-value">${r.qr_verified_at || 'N/A'}</span></div>
+                    </div>
+                    <button class="btn btn-back" onclick="window.location.href='/dashboard'">← Dashboard</button>
+                `;
+                return;
+            }
+
+            if (r.status !== 'active') {
+                card.innerHTML = `
+                    <div class="icon-circle error">❌</div>
+                    <h1>Cannot Verify</h1>
+                    <p class="subtitle">This reservation is <strong>${r.status}</strong> and cannot be verified.</p>
+                    <button class="btn btn-back" onclick="window.location.href='/dashboard'">← Dashboard</button>
+                `;
+                return;
+            }
+
+            if (r.grace_expired) {
+                card.innerHTML = `
+                    <div class="icon-circle expired">⏰</div>
+                    <h1>Grace Period Expired</h1>
+                    <p class="subtitle">The 15-minute verification window has passed.</p>
+                    <div class="details">
+                        <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${r.user_name}</span></div>
+                        <div class="detail-row"><span class="detail-label">Car Plate</span><span class="detail-value">${r.car_plate || '—'}</span></div>
+                        <div class="detail-row"><span class="detail-label">Slot</span><span class="detail-value">${r.slot_label || 'Slot ' + r.slot_id}</span></div>
+                    </div>
+                    <button class="btn btn-back" onclick="window.location.href='/dashboard'">← Dashboard</button>
+                `;
+                return;
+            }
+
+            // Active + within grace period → show confirm button
+            let graceClass = r.grace_minutes_left > 5 ? 'ok' : 'warning';
+            card.innerHTML = `
+                <div class="icon-circle pending">🔍</div>
+                <h1>Verify Reservation #${String(r.reservation_id).padStart(6, '0')}</h1>
+                <p class="subtitle">Scan verified — confirm arrival below</p>
+                <span class="grace-badge ${graceClass}">⏰ ${r.grace_minutes_left} min remaining</span>
+                <div class="details">
+                    <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${r.user_name}</span></div>
+                    <div class="detail-row"><span class="detail-label">Car Plate</span><span class="detail-value">${r.car_plate || '—'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${r.user_email || '—'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Slot</span><span class="detail-value">${r.slot_label || 'Slot ' + r.slot_id}</span></div>
+                    <div class="detail-row"><span class="detail-label">Start</span><span class="detail-value">${r.start_time}</span></div>
+                    <div class="detail-row"><span class="detail-label">End</span><span class="detail-value">${r.end_time}</span></div>
+                </div>
+                <button class="btn btn-confirm" id="confirmBtn" onclick="confirmReservation()">✅ Confirm Arrival</button>
+                <div class="status-msg" id="statusMsg"></div>
+                <button class="btn btn-back" onclick="window.location.href='/dashboard'">← Dashboard</button>
+            `;
+        }
+
+        async function confirmReservation() {
+            const btn = document.getElementById('confirmBtn');
+            const msg = document.getElementById('statusMsg');
+            btn.disabled = true;
+            btn.textContent = 'Confirming...';
+
+            try {
+                const res = await fetch(`${API}/verify-reservation/${RES_ID}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    msg.className = 'status-msg success';
+                    msg.textContent = '✅ ' + data.message;
+                    btn.textContent = 'Confirmed!';
+                    btn.style.background = '#22c55e';
+                    // Reload to show confirmed state
+                    setTimeout(() => loadDetails(), 1500);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                msg.className = 'status-msg error';
+                msg.textContent = '❌ ' + err.message;
+                btn.disabled = false;
+                btn.textContent = '✅ Confirm Arrival';
+            }
+        }
+
+        loadDetails();
+    </script>
+</body>
+</html>

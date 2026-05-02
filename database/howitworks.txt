@@ -1,0 +1,113 @@
+Viewed vehicle_detection.py:1-119
+Viewed slot_mapper.py:1-185
+Viewed debug_detect.py:1-40
+
+Now let me also check how the detection is called from app.py:
+
+Searched for "VehicleDetector\|process_frame\|detect_loop\|detection_thread"
+Searched for "vehicle_detection\|VehicleDetector\|detector\|process_frame\|check_slots"
+Searched for "detect|occupancy|video|frame|cv2"
+Searched for "is_occupied"
+Searched for "parking_slots"
+Viewed app.py:1-800
+Viewed models.sql:1-123
+
+Now I have a complete picture of how slot detection works. Here's the explanation:
+
+---
+
+## How Slot Detection Works in Your Smart Parking System
+
+Your system uses **image processing with adaptive thresholding + pixel counting** (not a YOLO neural network) to determine if a car is parked in a slot. Here's the full pipeline, broken into 3 stages:
+
+---
+
+### Stage 1: Slot Mapping (one-time setup)
+
+Before any detection can happen, every parking slot's **bounding box coordinates** (`x1, y1, x2, y2`) must be defined on the video frame.
+
+You have two tools for this:
+- **[slot_mapper.py](file:///z:/smart_parking/smart_parking/slot_mapper.py)** — An interactive OpenCV GUI. You click the top-left and bottom-right corner of each parking slot on a video frame. It saves the coordinates to `mapped_slots.json` and generates SQL.
+- **[map_slots.py](file:///z:/smart_parking/smart_parking/map_slots.py)** — A hardcoded version that defines slots in code and draws them on a frame.
+
+The result is stored in the **`parking_slots`** database table, where each row has:
+```
+slot_id | slot_label | x1 | y1 | x2 | y2 | is_occupied
+```
+
+---
+
+### Stage 2: Detection Algorithm ([vehicle_detection.py](file:///z:/smart_parking/smart_parking/detection/vehicle_detection.py))
+
+This is the core logic. For every video frame, it does this:
+
+#### Step 2a: Preprocess the frame
+```
+BGR frame → Grayscale → Gaussian Blur → Adaptive Threshold → Median Blur → Dilate
+```
+
+1. **Grayscale** — Converts the color image to black & white
+2. **Gaussian Blur (3×3)** — Smooths out noise
+3. **Adaptive Thresholding** — Converts the image to pure black and white, where objects/vehicles become **white pixels** and empty pavement becomes **black pixels**. It uses a local 25×25 neighbourhood to adapt to different lighting.
+4. **Median Blur** — Removes salt-and-pepper noise
+5. **Dilation** — Expands the white regions slightly to fill gaps
+
+The result is a **binary mask** where cars appear as blobs of white pixels.
+
+#### Step 2b: Count pixels per slot
+For each slot defined in the database:
+1. **Crop** the binary mask to the slot's bounding box (`processed[y1:y2, x1:x2]`)
+2. **Count non-zero (white) pixels** in that cropped region using `cv2.countNonZero()`
+3. Compare against the **threshold** (`OCCUPANCY_THRESHOLD = 800`)
+
+```python
+occupied = pixel_count >= 800  # 800 white pixels = car present
+```
+
+#### Step 2c: Calculate confidence
+```python
+confidence = min(pixel_count / slot_area, 1.0)
+```
+This gives a 0–1 score representing how "full" the slot region is with detected pixels.
+
+**In plain English:** If a car is parked in a slot, its shape creates many white pixels in the binary mask (usually well over 800). An empty slot is mostly dark pavement, producing very few white pixels (well under 800).
+
+---
+
+### Stage 3: Integration in the App ([app.py](file:///z:/smart_parking/smart_parking/app.py))
+
+Detection is triggered in **two ways**:
+
+| Trigger | How it works |
+|---|---|
+| **Video feed** (line 132–221) | Every frame streamed to the browser runs `detector.process_frame()`. Every **3 seconds**, the results are written to the database. |
+| **`POST /detect`** (line 551–616) | An on-demand API call reads a single frame from the video and updates all slot statuses in the DB. |
+
+After detection, the `is_occupied` column in `parking_slots` is updated to `TRUE` or `FALSE`, and the frontend reads this via the `GET /slots` API.
+
+---
+
+### Visual Summary
+
+```
+┌─────────────┐    ┌───────────────────┐    ┌────────────────┐
+│ Video Frame  │───▶│  Preprocess Frame  │───▶│  Binary Mask   │
+│ (from camera)│    │  (gray→blur→thresh │    │  (white=object │
+│              │    │   →median→dilate)  │    │   black=empty) │
+└─────────────┘    └───────────────────┘    └───────┬────────┘
+                                                     │
+                   ┌───────────────────┐             │
+                   │  For each slot:    │◀────────────┘
+                   │  Crop region       │
+                   │  Count white px    │
+                   │  px ≥ 800? → CAR   │
+                   │  px < 800? → EMPTY │
+                   └────────┬──────────┘
+                            │
+                   ┌────────▼──────────┐
+                   │  Update Database   │
+                   │  is_occupied=T/F   │
+                   └───────────────────┘
+```
+
+The threshold of **800 pixels** is the key tuning parameter — if detection is too sensitive (marking empty slots as occupied), you increase it; if it misses cars, you decrease it.

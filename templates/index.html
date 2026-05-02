@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Smart Parking System — View available slots, book parking, and monitor occupancy in real time.">
+    <title>Smart Parking System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- ===================== NAV BAR ===================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon"><i class="material-icons">local_parking</i></span>
+            <span class="nav-title">SmartPark</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link active" id="nav-home">Parking</a>
+            <a href="/dashboard" class="nav-link" id="nav-dashboard">Dashboard</a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme"><i
+                    class="material-icons">dark_mode</i></button>
+            <div class="nav-status" id="navStatus">
+                <span class="status-dot online"></span>
+                <span class="status-text">System Online</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO SECTION ===================== -->
+    <header class="hero" id="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Smart Parking <span class="gradient-text">Availability</span></h1>
+            <p class="hero-subtitle">Real-time slot monitoring &bull; Instant booking &bull; AI predictions</p>
+        </div>
+        <div class="hero-stats" id="heroStats">
+            <div class="stat-card" id="statTotal">
+                <div class="stat-number" id="totalCount">--</div>
+                <div class="stat-label">Total Slots</div>
+            </div>
+            <div class="stat-card available" id="statAvailable">
+                <div class="stat-number" id="availableCount">--</div>
+                <div class="stat-label">Available</div>
+            </div>
+            <div class="stat-card occupied" id="statOccupied">
+                <div class="stat-number" id="occupiedCount">--</div>
+                <div class="stat-label">Occupied</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="main-content">
+
+        <!-- Live Video Feed -->
+        <section class="section" id="videoSection">
+            <div class="section-header">
+                <h2 class="section-title">Live Detection Feed</h2>
+            </div>
+            <div class="video-feed-container">
+                <img src="/video-feed" alt="Live parking detection feed" id="videoFeed" class="video-feed">
+            </div>
+        </section>
+
+        <!-- Parking Grid -->
+        <section class="section" id="parkingSection">
+            <div class="section-header">
+                <h2 class="section-title">Parking Slots</h2>
+                <button class="btn btn-refresh" id="btnRefresh" onclick="refreshSlots()">
+                    <span class="btn-icon">🔄</span> Refresh
+                </button>
+            </div>
+            <div class="parking-grid" id="parkingGrid">
+                <!-- Slots injected by JS -->
+            </div>
+        </section>
+
+        <section class="section" id="reserveSection">
+            <h2 class="section-title">Reserve a Slot</h2>
+            <form class="reserve-form" id="reserveForm" onsubmit="handleReserve(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userName">Your Name</label>
+                        <input type="text" id="userName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="carPlate">Car Plate Number</label>
+                        <input type="text" id="carPlate" placeholder="e.g. KA-01-AB-1234" required
+                               style="text-transform:uppercase">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userEmail">Email Address</label>
+                        <input type="email" id="userEmail" placeholder="your@gmail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slotSelect">Slot</label>
+                        <select id="slotSelect" required>
+                            <option value="">Select a slot</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <input type="datetime-local" id="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endTime">End Time</label>
+                        <input type="datetime-local" id="endTime" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="btnReserve">
+                    <span class="btn-icon">📌</span> Reserve Slot
+                </button>
+                <div class="form-message" id="formMessage"></div>
+                <!-- PDF download link shown after successful reservation -->
+                <div id="pdfDownloadArea" style="display:none; margin-top:12px; text-align:center">
+                    <a id="pdfDownloadLink" href="#" target="_blank"
+                       style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
+                              background:var(--accent,#3b82f6);color:#fff;border-radius:8px;
+                              text-decoration:none;font-weight:600;font-size:0.9rem">
+                        <i class="material-icons" style="font-size:18px">picture_as_pdf</i>
+                        Download Parking Token PDF
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <!-- Predictions -->
+        <section class="section" id="predictSection">
+            <h2 class="section-title">Availability Forecast</h2>
+            <div class="prediction-cards" id="predictionCards">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <!-- Peak Hours Chart -->
+        <section class="section" id="peakSection">
+            <h2 class="section-title">Peak Hours Today</h2>
+            <p class="section-subtitle">Know the busiest times to plan your visit</p>
+            <div class="chart-card" id="peakChartCard">
+                <div class="chart-wrapper">
+                    <canvas id="peakHoursChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer" id="footer">
+        <p>&copy; 2026 SmartPark &mdash; Intelligent Parking Solutions</p>
+    </footer>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Theme initialisation (runs before paint to prevent flash) -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem('sp-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.innerHTML = saved === 'light' ? '<i class="material-icons">light_mode</i>' : '<i class="material-icons">dark_mode</i>';
+        })();
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('sp-theme', next);
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.innerHTML = next === 'light' ? '<i class="material-icons">light_mode</i>' : '<i class="material-icons">dark_mode</i>';
+        }
+    </script>
+    <script src="/static/js/main.js"></script>
+</body>
+
+</html>

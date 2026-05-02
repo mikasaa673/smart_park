@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking System – Flow Chart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 60px;
+        }
+        .chart-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+        }
+        h1 { font-size: 26px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+        .sub { font-size: 13px; color: #64748b; margin-bottom: 36px; }
+
+        /* ── canvas ─────────────────────────── */
+        .canvas {
+            position: relative;
+            width: 1100px;
+            height: 700px;
+        }
+
+        /* ── wires ──────────────────────────── */
+        svg.w {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+        svg.w line, svg.w polyline {
+            stroke: #475569; stroke-width: 2.2; fill: none;
+        }
+
+        /* ── nodes ──────────────────────────── */
+        .n {
+            position: absolute;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center;
+            font-weight: 600; font-size: 13.5px; line-height: 1.35;
+            color: #fff; z-index: 2;
+            transition: transform .18s ease, box-shadow .18s ease;
+            cursor: default;
+        }
+        .n:hover { transform: scale(1.07); z-index: 10; }
+
+        /* terminal */
+        .n.t {
+            width: 124px; height: 50px; border-radius: 25px;
+            background: #2dd4a8; font-size: 16px; font-weight: 700;
+            box-shadow: 0 4px 14px rgba(45,212,168,.35);
+        }
+        .n.t:hover { box-shadow: 0 6px 22px rgba(45,212,168,.55); }
+
+        /* process */
+        .n.p {
+            width: 150px; height: 64px; border-radius: 9px;
+            background: #5b9bf5;
+            box-shadow: 0 4px 14px rgba(91,155,245,.30);
+            padding: 4px 8px;
+        }
+        .n.p:hover { box-shadow: 0 6px 22px rgba(91,155,245,.55); }
+
+        /* decision */
+        .n.d {
+            width: 170px; height: 64px; border-radius: 9px;
+            background: #f59e0b; font-size: 13px;
+            box-shadow: 0 4px 14px rgba(245,158,11,.30);
+            padding: 4px 8px;
+        }
+        .n.d:hover { box-shadow: 0 6px 22px rgba(245,158,11,.55); }
+
+        /* confirm (green) */
+        .n.g {
+            width: 150px; height: 64px; border-radius: 9px;
+            background: #22c55e;
+            box-shadow: 0 4px 14px rgba(34,197,94,.30);
+            padding: 4px 8px;
+        }
+        .n.g:hover { box-shadow: 0 6px 22px rgba(34,197,94,.55); }
+
+        /* revoke (red) */
+        .n.r {
+            width: 150px; height: 64px; border-radius: 9px;
+            background: #ef4444;
+            box-shadow: 0 4px 14px rgba(239,68,68,.30);
+            padding: 4px 8px;
+        }
+        .n.r:hover { box-shadow: 0 6px 22px rgba(239,68,68,.55); }
+
+        /* branch labels */
+        .bl { position: absolute; font-size: 13px; font-weight: 700; z-index: 3; }
+        .bl.y { color: #16a34a; }
+        .bl.x { color: #dc2626; }
+
+        /* legend */
+        .legend {
+            display: flex; flex-direction: column; gap: 14px;
+            padding: 18px 20px;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+            margin-top: 20px;
+            position: sticky; top: 40px;
+        }
+        .legend-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 2px; }
+        .legend-i { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #475569; font-weight: 500; }
+        .sw { width: 24px; height: 16px; border-radius: 3px; flex-shrink: 0; }
+        .sw.st { background: #2dd4a8; border-radius: 7px; }
+        .sw.pr { background: #5b9bf5; }
+        .sw.de { background: #f59e0b; }
+        .sw.co { background: #22c55e; }
+        .sw.re { background: #ef4444; }
+    </style>
+</head>
+<body>
+
+<h1>Smart Parking System — Flow Chart</h1>
+<p class="sub">End-to-end system architecture &amp; data flow</p>
+
+<!--
+  GRID
+  ─────────────────────────────────────────────────
+  5 columns  |  col left-x:  100  290  480  670  860
+             |  col center-x: 175  365  555  745  935
+  Node size  |  150 × 64  (process)  124 × 50 (terminal)
+  Row tops   |  R1=20  R2=178  R3=336  R4=494  R5=610
+  Row centers|  R1=52  R2=210  R3=368  R4=526  R5=635
+  Snake mid  |  s12=131   s23=289
+-->
+
+<div class="chart-wrap">
+<div class="canvas">
+
+<!-- ═══════ SVG WIRES ═══════ -->
+<svg class="w" viewBox="0 0 1100 700">
+<defs>
+    <marker id="a" markerWidth="10" markerHeight="7"
+            refX="9" refY="3.5" orient="auto" fill="#475569">
+        <polygon points="0 0,10 3.5,0 7"/>
+    </marker>
+</defs>
+
+<!-- ── ROW 1  arrows (L→R) ────────────────────── -->
+<!-- Start → CCTV -->
+<line x1="237" y1="52" x2="290" y2="52" marker-end="url(#a)"/>
+<!-- CCTV → Frame Capture -->
+<line x1="440" y1="52" x2="480" y2="52" marker-end="url(#a)"/>
+<!-- Frame → Pre-processing -->
+<line x1="630" y1="52" x2="670" y2="52" marker-end="url(#a)"/>
+<!-- Pre-processing → Slot Overlap -->
+<line x1="820" y1="52" x2="860" y2="52" marker-end="url(#a)"/>
+
+<!-- ── SNAKE  Row 1 → Row 2 ───────────────────── -->
+<polyline points="935,84 935,131 175,131 175,178" marker-end="url(#a)"/>
+
+<!-- ── ROW 2  arrows (L→R) ────────────────────── -->
+<line x1="250" y1="210" x2="290" y2="210" marker-end="url(#a)"/>
+<line x1="440" y1="210" x2="480" y2="210" marker-end="url(#a)"/>
+<line x1="630" y1="210" x2="670" y2="210" marker-end="url(#a)"/>
+<line x1="820" y1="210" x2="860" y2="210" marker-end="url(#a)"/>
+
+<!-- ── SNAKE  Row 2 → Row 3 ───────────────────── -->
+<polyline points="935,242 935,289 175,289 175,336" marker-end="url(#a)"/>
+
+<!-- ── ROW 3  arrows (L→R) ────────────────────── -->
+<line x1="250" y1="368" x2="290" y2="368" marker-end="url(#a)"/>
+<line x1="440" y1="368" x2="480" y2="368" marker-end="url(#a)"/>
+<line x1="630" y1="368" x2="670" y2="368" marker-end="url(#a)"/>
+<line x1="820" y1="368" x2="850" y2="368" marker-end="url(#a)"/>
+
+<!-- ── BRANCH from Grace Period ────────────────── -->
+<!-- Yes: snake down-left to Confirmed (col 1) -->
+<polyline points="935,400 935,447 175,447 175,494" marker-end="url(#a)"/>
+<!-- No: straight down to Auto-Cancel (col 5) -->
+<line x1="935" y1="400" x2="935" y2="494" marker-end="url(#a)"/>
+
+<!-- ── CONVERGE to End ────────────────────────── -->
+<!-- Confirmed → End -->
+<polyline points="175,558 175,582 542,582 542,610" marker-end="url(#a)"/>
+<!-- Auto-Cancel → End -->
+<polyline points="935,558 935,592 568,592 568,610" marker-end="url(#a)"/>
+
+</svg>
+
+<!-- ═══════ ROW 1 — Video Pipeline ═══════ -->
+
+<div class="n t" style="left:113px; top:27px;">Start</div>
+
+<div class="n p" style="left:290px; top:20px;">
+    CCTV /<br>Video Feed
+</div>
+
+<div class="n p" style="left:480px; top:20px;">
+    Frame<br>Capture
+</div>
+
+<div class="n p" style="left:670px; top:20px;">
+    Pre-<br>processing
+</div>
+
+<div class="n p" style="left:860px; top:20px;">
+    Slot Overlap<br>Check
+</div>
+
+<!-- ═══════ ROW 2 — Backend ═══════ -->
+
+<div class="n p" style="left:100px; top:178px;">
+    Vehicle<br>Detection
+</div>
+
+<div class="n p" style="left:290px; top:178px;">
+    Database<br>Update
+</div>
+
+<div class="n p" style="left:480px; top:178px;">
+    Flask API
+</div>
+
+<div class="n p" style="left:670px; top:178px;">
+    Web<br>Dashboard
+</div>
+
+<div class="n p" style="left:860px; top:178px;">
+    Reservation<br>Page
+</div>
+
+<!-- ═══════ ROW 3 — Reservation & Verify ═══════ -->
+
+<div class="n p" style="left:100px; top:336px;">
+    User<br>Input
+</div>
+
+<div class="n p" style="left:290px; top:336px;">
+    Ticket PDF<br>Generation
+</div>
+
+<div class="n p" style="left:480px; top:336px;">
+    Email<br>Notification
+</div>
+
+<div class="n p" style="left:670px; top:336px;">
+    QR Verification<br>
+    <span style="font-weight:400;font-size:11px;">(Admin Scan)</span>
+</div>
+
+<div class="n d" style="left:850px; top:336px;">
+    Grace Period?<br>
+    <span style="font-weight:400;font-size:11px;">15 min window</span>
+</div>
+
+<!-- Branch labels -->
+<span class="bl y" style="left:540px; top:436px;">Yes</span>
+<span class="bl x" style="left:948px; top:440px;">No</span>
+
+<!-- ═══════ ROW 4 — Outcomes ═══════ -->
+
+<div class="n g" style="left:100px; top:494px;">
+    Confirmed
+</div>
+
+
+<div class="n r" style="left:860px; top:494px;">
+    Auto-Cancel /<br>Revoke
+</div>
+
+<!-- ═══════ ROW 5 — End ═══════ -->
+
+<div class="n t" style="left:493px; top:610px;">End</div>
+
+</div><!-- /canvas -->
+
+<!-- Legend -->
+<div class="legend">
+    <div class="legend-title">Legend</div>
+    <div class="legend-i"><div class="sw st"></div>Start / End</div>
+    <div class="legend-i"><div class="sw pr"></div>Process</div>
+    <div class="legend-i"><div class="sw de"></div>Decision</div>
+    <div class="legend-i"><div class="sw co"></div>Confirmed</div>
+    <div class="legend-i"><div class="sw re"></div>Revoke / Cancel</div>
+</div>
+
+</div><!-- /chart-wrap -->
+
+</body>
+</html>
