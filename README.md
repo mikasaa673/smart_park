@@ -1,4 +1,4 @@
-# 🅿️ Smart Parking Availability System
+#  Smart Parking Availability System
 
 A real-time AI-powered parking management system that uses **computer vision** to detect vehicle occupancy, manages slot reservations with **QR-based verification**, sends **email notifications**, and provides **predictive analytics** for future availability.
 
@@ -6,7 +6,7 @@ Built with **Flask**, **OpenCV**, **scikit-learn**, **MySQL**, and **ReportLab**
 
 ---
 
-## ✨ Features
+##  Features
 
 | Feature | Description |
 |---|---|
@@ -23,7 +23,7 @@ Built with **Flask**, **OpenCV**, **scikit-learn**, **MySQL**, and **ReportLab**
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -39,7 +39,7 @@ Built with **Flask**, **OpenCV**, **scikit-learn**, **MySQL**, and **ReportLab**
 
 ---
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```
 smart_parking/
@@ -77,7 +77,7 @@ smart_parking/
 
 ---
 
-## ⚡ Setup Guide
+##  Setup Guide
 
 ### Prerequisites
 
@@ -178,7 +178,7 @@ The server starts at **http://localhost:5000**.
 
 ---
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
